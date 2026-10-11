@@ -257,28 +257,31 @@
       </div>
     </div>
 
-    <!-- THẺ 5: NÚT THAO TÁC CỦA GIÁO VIÊN (col-span-2) -->
-    <div class="lg:col-span-2 kpi-card p-2 flex flex-col justify-center gap-1.5">
-      <!-- Hàng nút chính 1 -->
+    <!-- THẺ 5: BỘ ĐIỀU KHIỂN CỦA GIÁO VIÊN (col-span-3) -->
+    <div class="lg:col-span-3 kpi-card p-2 flex flex-col justify-center gap-1.5">
+      <!-- Hàng nút chính 1: Bắt đầu, Skip câu, Đáp án -->
       <div class="grid grid-cols-3 gap-1">
-        <button id="btn-start" onclick="adminStartGame()" class="py-1.5 px-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 text-white font-black text-xs transition active:scale-95 shadow flex items-center justify-center gap-1">
-          <span>▶</span> <span class="hidden sm:inline">Bắt đầu</span>
+        <button id="btn-start" onclick="adminStartGame()" class="py-1.5 px-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 text-white font-black text-xs transition active:scale-95 shadow flex items-center justify-center gap-1">
+          <span>▶</span> <span>Bắt đầu</span>
         </button>
-        <button id="btn-skip" onclick="adminSkip()" class="py-1.5 px-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 text-white font-bold text-[11px] transition active:scale-95 shadow flex items-center justify-center gap-1" title="Hiện đáp án ngay">
-          <span>⚡</span> <span class="hidden sm:inline">Hiện</span>
+        <button id="btn-skip" onclick="adminSkipQuestion()" class="py-1.5 px-1 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 text-white font-black text-xs transition active:scale-95 shadow flex items-center justify-center gap-1" title="Bỏ qua câu hỏi này để sang câu tiếp theo ngay lập tức">
+          <span>⏭</span> <span>Skip câu</span>
         </button>
-        <button id="btn-end" onclick="adminEndGame()" class="py-1.5 px-2 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 text-white font-bold text-xs transition active:scale-95 shadow flex items-center justify-center gap-1">
-          <span>⏹</span> <span class="hidden sm:inline">Kết thúc</span>
+        <button id="btn-reveal" onclick="adminRevealAnswer()" class="py-1.5 px-1 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 text-slate-950 font-black text-xs transition active:scale-95 shadow flex items-center justify-center gap-1" title="Hiện đáp án đúng ngay không cần đợi hết giờ">
+          <span>⚡</span> <span>Đáp án</span>
         </button>
       </div>
 
-      <!-- Hàng nút phụ 2: Đặt lại & Âm thanh -->
-      <div class="grid grid-cols-2 gap-1 text-[11px]">
-        <button onclick="adminResetGame()" class="py-1 px-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold transition text-center flex items-center justify-center gap-1" title="Khởi động lại vòng thi về phòng chờ">
+      <!-- Hàng nút phụ 2: Kết thúc, Đặt lại, Âm thanh -->
+      <div class="grid grid-cols-3 gap-1 text-[11px]">
+        <button id="btn-end" onclick="adminEndGame()" class="py-1 px-1 rounded-lg bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 border border-rose-500/40 font-bold transition active:scale-95 shadow flex items-center justify-center gap-1" title="Kết thúc lượt thi">
+          <span>⏹</span> <span>Kết thúc</span>
+        </button>
+        <button onclick="adminResetGame()" class="py-1 px-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold transition text-center flex items-center justify-center gap-1" title="Khởi động lại vòng thi về phòng chờ">
           <span>🔄</span> <span>Đặt lại</span>
         </button>
-        <button id="btn-sound" onclick="toggleAdminSound()" class="py-1 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold transition text-center flex items-center justify-center gap-1" title="Bật/Tắt âm thanh">
-          <span id="sound-icon">🔊 Âm thanh</span>
+        <button id="btn-sound" onclick="toggleAdminSound()" class="py-1 px-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold transition text-center flex items-center justify-center gap-1" title="Bật/Tắt âm thanh">
+          <span id="sound-icon">🔊 Âm</span>
         </button>
       </div>
     </div>
@@ -648,6 +651,14 @@
     function adminStartGame() {
       soundEngine.init();
       socket.emit('admin:start_game');
+    }
+
+    function adminSkipQuestion() {
+      socket.emit('admin:skip_question');
+    }
+
+    function adminRevealAnswer() {
+      socket.emit('admin:reveal_answer');
     }
 
     function adminSkip() {

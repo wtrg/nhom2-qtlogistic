@@ -574,6 +574,14 @@ io.on('connection', (socket) => {
     startCountdownToGame();
   });
 
+  // Hiện đáp án ngay lập tức (không chờ hết 15s)
+  socket.on('admin:reveal_answer', () => {
+    if (gameState.status === 'question') {
+      transitionToReveal();
+    }
+  });
+
+  // Bỏ qua câu hỏi ngay lập tức sang câu tiếp theo (Skip)
   socket.on('admin:skip_question', () => {
     if (gameState.status === 'countdown') {
       clearInterval(gameTimerLoop);
@@ -597,9 +605,7 @@ io.on('connection', (socket) => {
       });
       startSyncTimer();
       broadcastLeaderboard();
-    } else if (gameState.status === 'question') {
-      transitionToReveal();
-    } else if (gameState.status === 'reveal') {
+    } else if (gameState.status === 'question' || gameState.status === 'reveal') {
       transitionToNextQuestion();
     }
   });
