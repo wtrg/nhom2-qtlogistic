@@ -268,64 +268,9 @@ function startCountdownToGame() {
 
         startSyncTimer();
         broadcastLeaderboard();
-        simulateMockAnswers();
       }, 700);
     }
   }, 1000);
-}
-
-let mockTimers = [];
-
-function clearMockTimers() {
-  mockTimers.forEach(t => clearTimeout(t));
-  mockTimers = [];
-}
-
-function simulateMockAnswers() {
-  clearMockTimers();
-  if (gameState.status !== 'question') return;
-
-  const q = QUESTIONS[gameState.currentQuestionIndex];
-  if (!q) return;
-
-  const correctIdx = q.options.findIndex(o => o.isCorrect);
-
-  students.forEach((student, socketId) => {
-    if (socketId.startsWith('mock-')) {
-      // Ngẫu nhiên nộp bài từ 2s đến 15s
-      const delay = 2000 + Math.random() * 13000;
-      const t = setTimeout(() => {
-        if (gameState.status !== 'question') return;
-        if (currentRoundAnswers.has(socketId)) return;
-
-        // 75% cơ hội trả lời đúng
-        const isRight = Math.random() < 0.75;
-        let chosenIdx = isRight ? correctIdx : Math.floor(Math.random() * q.options.length);
-
-        const isCorrect = (chosenIdx === correctIdx);
-        let points = 0;
-        if (isCorrect) {
-          const speedBonus = Math.max(0, Math.floor(50 - (delay / 400)));
-          const streakBonus = student.streak >= 2 ? (student.streak * 20) : 0;
-          points = 100 + speedBonus + streakBonus;
-        }
-
-        currentRoundAnswers.set(socketId, {
-          optionIndex: chosenIdx,
-          isCorrect,
-          pointsEarned: points,
-          timeSpent: Math.floor(delay)
-        });
-
-        io.emit('sync:progress', {
-          answersCount: currentRoundAnswers.size,
-          totalStudents: students.size
-        });
-      }, delay);
-
-      mockTimers.push(t);
-    }
-  });
 }
 
 function startSyncTimer() {
@@ -466,7 +411,6 @@ function transitionToNextQuestion() {
     });
 
     broadcastLeaderboard();
-    simulateMockAnswers();
   } else {
     // End Game
     gameState.status = 'finished';
@@ -617,56 +561,6 @@ io.on('connection', (socket) => {
     });
 
     io.emit('game:reset', { gameState });
-    broadcastLeaderboard();
-  });
-
-  socket.on('admin:generate_mock_students', (data) => {
-    const targetCount = (data && data.count) || 50;
-    const colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
-    const avatars = ['🏎️', '🏎️', '🏎️', '🚢', '🚚', '✈️', '🚆'];
-    const vietnameseNames = [
-      "Nguyễn Quốc Anh", "Trần Mai Linh", "Lê Hoàng Long", "Phạm Minh Đức", "Vũ Thùy Dung",
-      "Đặng Hải Nam", "Bùi Lan Anh", "Đỗ Tuấn Kiệt", "Hồ Ngọc Hà", "Ngô Gia Bảo",
-      "Dương Khánh Vy", "Lý Quang Hùng", "Phan Thanh Tùng", "Trịnh Bảo Ngọc", "Hoàng Kim Ngân",
-      "Mai Thành Đạt", "Võ Phương Thảo", "Đinh Văn Hậu", "Lương Mỹ Linh", "Cao Tiến Dũng",
-      "Tô Hoài An", "Tạ Đình Phong", "Khổng Tú Quỳnh", "Chu Minh Trí", "Quách Tuấn Du",
-      "Lâm Thảo My", "Nghiêm Xuân Tú", "Ông Cao Thắng", "Phùng Quốc Việt", "Diệp Bảo Châu",
-      "Trương Mỹ Hoa", "Hà Trọng Nghĩa", "Ân Đăng Khôi", "Doãn Hải My", "Giang Văn Minh",
-      "Kim Bảo Trâm", "Mạc Đăng Dung", "Nông Đức Mạnh", "Ôn Gia Hào", "Sơn Tùng",
-      "Thái Hòa", "Uông Chu Lưu", "Văn Mai Hương", "Xa Thị Cúc", "Yên Đan",
-      "Thạch Kim Tuấn", "Bạch Công Khanh", "Châu Bùi", "Đoàn Văn Hậu", "Hứa Vĩ Văn",
-      "Kha Mỹ Vân", "Lạc Long Quân", "Âu Cơ", "Chử Đồng Tử", "Thánh Gióng",
-      "Sơn Tinh", "Thủy Tinh", "Ngọc Hân", "Quang Trung", "Lê Lợi"
-    ];
-
-    for (let i = 1; i <= targetCount; i++) {
-      const mockId = `mock-${i}`;
-      const name = vietnameseNames[(i - 1) % vietnameseNames.length] + (i > vietnameseNames.length ? ` (${i})` : '');
-      students.set(mockId, {
-        id: mockId,
-        name: name,
-        avatar: avatars[i % avatars.length],
-        carColor: colors[i % colors.length],
-        score: 0,
-        streak: 0,
-        maxStreak: 0,
-        correctCount: 0,
-        wrongCount: 0,
-        lastAnswerCorrect: null
-      });
-    }
-
-    broadcastLeaderboard();
-  });
-
-  socket.on('admin:clear_mock_students', () => {
-    clearMockTimers();
-    for (let key of Array.from(students.keys())) {
-      if (key.startsWith('mock-')) {
-        students.delete(key);
-        currentRoundAnswers.delete(key);
-      }
-    }
     broadcastLeaderboard();
   });
 

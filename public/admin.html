@@ -250,10 +250,10 @@
         <span>🎯</span> <span>CÂU HỎI</span>
       </div>
       <div class="flex items-baseline gap-1 text-sky-300 font-black text-xl font-mono" id="current-lap-indicator">
-        1 / 10
+        -- / 10
       </div>
       <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden mt-1.5 border border-slate-800">
-        <div id="q-progress-bar" class="h-full bg-gradient-to-r from-sky-400 to-blue-600 rounded-full transition-all duration-300" style="width: 10%;"></div>
+        <div id="q-progress-bar" class="h-full bg-gradient-to-r from-sky-400 to-blue-600 rounded-full transition-all duration-300" style="width: 0%;"></div>
       </div>
     </div>
 
@@ -272,15 +272,12 @@
         </button>
       </div>
 
-      <!-- Hàng nút phụ 2 -->
-      <div class="grid grid-cols-3 gap-1 text-[11px]">
-        <button onclick="adminResetGame()" class="py-1 px-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition text-center" title="Khởi động lại vòng thi">
-          ⚙ Cài đặt
+      <!-- Hàng nút phụ 2: Đặt lại & Âm thanh -->
+      <div class="grid grid-cols-2 gap-1 text-[11px]">
+        <button onclick="adminResetGame()" class="py-1 px-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold transition text-center flex items-center justify-center gap-1" title="Khởi động lại vòng thi về phòng chờ">
+          <span>🔄</span> <span>Đặt lại</span>
         </button>
-        <button onclick="adminMock50()" class="py-1 px-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition text-center" title="Mô phỏng 50 xe học sinh">
-          📊 Thống kê
-        </button>
-        <button id="btn-sound" onclick="toggleAdminSound()" class="py-1 px-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition text-center" title="Bật/Tắt âm thanh">
+        <button id="btn-sound" onclick="toggleAdminSound()" class="py-1 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold transition text-center flex items-center justify-center gap-1" title="Bật/Tắt âm thanh">
           <span id="sound-icon">🔊 Âm thanh</span>
         </button>
       </div>
@@ -300,32 +297,49 @@
           <!-- Header câu hỏi -->
           <div class="flex items-center justify-between mb-3">
             <span id="q-category-tag" class="px-3 py-1 rounded-full bg-blue-600/25 text-blue-300 border border-blue-400/40 text-xs font-bold flex items-center gap-1.5">
-              <span>📖</span> <span id="q-category-text">Chương 1: Tổng quan</span>
+              <span>📖</span> <span id="q-category-text">Chờ bắt đầu</span>
             </span>
             <span id="q-number-tag" class="text-xs font-black text-amber-400 font-mono">
-              Câu hỏi 1 / 10
+              Phòng chờ
             </span>
           </div>
 
-          <!-- Khung nội dung câu hỏi lớn kèm icon Tàu (Ảnh 2) -->
-          <div class="bg-slate-950/90 p-4 rounded-2xl border border-blue-500/40 shadow-inner mb-4 flex items-start gap-3.5">
+          <!-- KHUNG PHÒNG CHỜ (HIỂN THỊ KHI CHƯA BẮT ĐẦU HOẶC SAU KHI ĐẶT LẠI) -->
+          <div id="lobby-waiting-card" class="bg-slate-950/90 p-6 rounded-2xl border border-blue-500/40 shadow-inner mb-4 flex flex-col items-center justify-center text-center space-y-3 py-8">
+            <div class="w-16 h-16 rounded-2xl bg-[#0c2048] border border-blue-400/50 flex items-center justify-center p-2 shadow-lg animate-pulse">
+              <img src="/assets/logo_ship.png" class="w-full h-full object-contain" alt="Logo" />
+            </div>
+            <div>
+              <h3 class="text-base sm:text-lg font-black text-amber-300">PHÒNG CHỜ THI ĐẤU TRỰC TUYẾN</h3>
+              <p class="text-xs text-slate-300 mt-1.5 max-w-sm mx-auto leading-relaxed">
+                Mời các bạn học sinh truy cập link bên trên hoặc quét mã để vào phòng và chọn xe.<br>
+                Khi cả lớp đã đông đủ, Thầy/Cô bấm <b>"▶ Bắt đầu"</b> ở góc trên để mở câu hỏi đầu tiên!
+              </p>
+            </div>
+            <div class="px-4 py-1.5 rounded-full bg-blue-600/20 border border-blue-400/40 text-xs font-bold text-sky-300 flex items-center gap-2">
+              <span>🚦</span> <span>Câu hỏi & 4 đáp án sẽ xuất hiện đồng bộ khi Thầy/Cô bấm Bắt đầu</span>
+            </div>
+          </div>
+
+          <!-- Khung nội dung câu hỏi lớn kèm icon Tàu (ẨN KHI CHƯA BẮT ĐẦU) -->
+          <div id="q-content-box" class="hidden bg-slate-950/90 p-4 rounded-2xl border border-blue-500/40 shadow-inner mb-4 flex items-start gap-3.5">
             <div class="w-12 h-12 rounded-xl bg-[#0c2048] border border-blue-400/50 flex items-center justify-center shrink-0 p-1 shadow">
               <img id="q-icon-display" src="/assets/logo_ship.png" class="w-full h-full object-contain" alt="Icon" />
             </div>
             <p id="q-text-display" class="text-base sm:text-lg font-bold text-slate-100 leading-snug pt-1 flex-1">
-              Bấm "Bắt đầu" ở góc trên để mở câu hỏi đầu tiên...
+              Đang chuẩn bị câu hỏi...
             </p>
           </div>
 
-          <!-- 4 ĐÁP ÁN A, B, C, D (THANH NGANG MÀU SẮC CHUẨN XÁC ẢNH 2) -->
-          <div class="grid grid-cols-1 gap-2.5" id="options-display-grid">
+          <!-- 4 ĐÁP ÁN A, B, C, D (ẨN KHI CHƯA BẮT ĐẦU) -->
+          <div class="hidden grid grid-cols-1 gap-2.5" id="options-display-grid">
             
             <!-- OPTION A (Đỏ) -->
             <div id="opt-A" class="admin-opt-A p-3.5 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-3 transition-all duration-300">
               <span class="w-8 h-8 rounded-full bg-gradient-to-tr from-rose-600 to-red-500 text-white font-black flex items-center justify-center shrink-0 text-sm shadow">
                 A
               </span>
-              <span class="opt-text flex-1 text-slate-100 font-bold leading-snug">Chỉ vận chuyển bằng đường bộ</span>
+              <span class="opt-text flex-1 text-slate-100 font-bold leading-snug"></span>
             </div>
 
             <!-- OPTION B (Lam) -->
@@ -333,7 +347,7 @@
               <span class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-cyan-500 text-white font-black flex items-center justify-center shrink-0 text-sm shadow">
                 B
               </span>
-              <span class="opt-text flex-1 text-slate-100 font-bold leading-snug">Kết hợp từ hai phương thức vận tải trở lên</span>
+              <span class="opt-text flex-1 text-slate-100 font-bold leading-snug"></span>
             </div>
 
             <!-- OPTION C (Lục / Teal) -->
@@ -341,7 +355,7 @@
               <span class="w-8 h-8 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-black flex items-center justify-center shrink-0 text-sm shadow">
                 C
               </span>
-              <span class="opt-text flex-1 text-slate-100 font-bold leading-snug">Chỉ vận chuyển bằng đường biển</span>
+              <span class="opt-text flex-1 text-slate-100 font-bold leading-snug"></span>
             </div>
 
             <!-- OPTION D (Vàng / Amber) -->
@@ -349,7 +363,7 @@
               <span class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-600 to-yellow-500 text-white font-black flex items-center justify-center shrink-0 text-sm shadow">
                 D
               </span>
-              <span class="opt-text flex-1 text-slate-100 font-bold leading-snug">Chỉ vận chuyển bằng đường hàng không</span>
+              <span class="opt-text flex-1 text-slate-100 font-bold leading-snug"></span>
             </div>
 
           </div>
@@ -745,6 +759,15 @@
       document.getElementById('praise-spotlight').classList.add('hidden');
       document.getElementById('q-explanation-box').classList.add('hidden');
       document.getElementById('master-sync-clock').textContent = "20s";
+
+      // Ẩn câu hỏi & đáp án, hiển thị thẻ phòng chờ
+      document.getElementById('lobby-waiting-card').classList.remove('hidden');
+      document.getElementById('q-content-box').classList.add('hidden');
+      document.getElementById('options-display-grid').classList.add('hidden');
+      document.getElementById('q-category-text').textContent = "Chờ bắt đầu";
+      document.getElementById('q-number-tag').textContent = "Phòng chờ";
+      document.getElementById('current-lap-indicator').textContent = "-- / 10";
+      document.getElementById('q-progress-bar').style.width = "0%";
     });
 
     function showFullscreenCountdown(seconds, title, subtitle, tip, type) {
@@ -816,6 +839,11 @@
     // HIỂN THỊ CÂU HỎI TRANG TRỌNG (ẢNH 2)
     function displayQuestionClean(q, idx, total) {
       currentQuestionData = q;
+
+      // Ẩn phòng chờ, hiện khung câu hỏi và 4 đáp án
+      document.getElementById('lobby-waiting-card').classList.add('hidden');
+      document.getElementById('q-content-box').classList.remove('hidden');
+      document.getElementById('options-display-grid').classList.remove('hidden');
 
       document.getElementById('q-category-text').textContent = q.round;
       document.getElementById('q-number-tag').textContent = `Câu hỏi ${idx + 1} / ${total}`;
@@ -911,16 +939,6 @@
         standingsEl.classList.remove('hidden');
         btnStandings.className = "px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-black transition shadow-sm flex items-center gap-1";
         btnHighway.className = "px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition";
-      }
-    }
-
-    function adminMock50() {
-      socket.emit('admin:generate_mock_students', { count: 50 });
-    }
-
-    function adminClearMock() {
-      if (confirm("Thầy/Cô có muốn xóa toàn bộ học sinh thử nghiệm để chuẩn bị vào lớp thật không?")) {
-        socket.emit('admin:clear_mock_students');
       }
     }
 
