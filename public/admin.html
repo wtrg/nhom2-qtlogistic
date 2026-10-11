@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng Điều Khiển Giáo Viên - Ôn Tập: Vận Tải Đa Phương Thức</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #030818;
+      color: #f1f5f9;
+    }
+
+    /* Glassmorphism Cards with Neon Cyan Borders (Image 2) */
+    .glass-panel-neon {
+      background: rgba(8, 20, 48, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(0, 168, 255, 0.5);
+      box-shadow: 0 0 25px rgba(0, 120, 255, 0.2), inset 0 0 15px rgba(0, 100, 255, 0.1);
+      border-radius: 24px;
+    }
+
+    .kpi-card {
+      background: rgba(6, 16, 38, 0.9);
+      border: 1px solid rgba(0, 140, 255, 0.3);
+      border-radius: 20px;
+    }
+
+    /* Option Cards styling matching Image 2 */
+    .admin-opt-A {
+      background: rgba(35, 12, 22, 0.85);
+      border: 1.5px solid rgba(244, 63, 94, 0.45);
+    }
+    .admin-opt-B {
+      background: rgba(10, 24, 48, 0.85);
+      border: 1.5px solid rgba(14, 165, 233, 0.45);
+    }
+    .admin-opt-C {
+      background: rgba(8, 28, 28, 0.85);
+      border: 1.5px solid rgba(16, 185, 129, 0.45);
+    }
+    .admin-opt-D {
+      background: rgba(35, 26, 10, 0.85);
+      border: 1.5px solid rgba(245, 158, 11, 0.45);
+    }
+
+    .track-kerb-top {
+      background: repeating-linear-gradient(90deg, #ef4444 0px, #ef4444 24px, #f8fafc 24px, #f8fafc 48px);
+      height: 4px;
+    }
+    .track-kerb-bottom {
+      background: repeating-linear-gradient(90deg, #f8fafc 0px, #f8fafc 24px, #ef4444 24px, #ef4444 48px);
+      height: 4px;
+    }
+
+    .finish-flag-bar {
+      background-image: 
+        linear-gradient(45deg, #000 25%, transparent 25%), 
+        linear-gradient(-45deg, #000 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #000 75%), 
+        linear-gradient(-45deg, transparent 75%, #000 75%);
+      background-size: 12px 12px;
+      background-position: 0 0, 0 6px, 6px -6px, -6px 0px;
+      background-color: #fff;
+    }
+
+    .f1-car-highway {
+      transition: left 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.4s ease, opacity 0.4s ease;
+    }
+
+    .nitro-flame {
+      animation: nitroPulse 0.3s infinite alternate;
+    }
+    @keyframes nitroPulse {
+      0% { transform: scale(0.9) rotate(-3deg); filter: drop-shadow(0 0 5px #f97316); }
+      100% { transform: scale(1.2) rotate(3deg); filter: drop-shadow(0 0 14px #ef4444); }
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(0, 168, 255, 0.3);
+      border-radius: 9999px;
+    }
+
+    /* Fullscreen countdown */
+    @keyframes punchScale {
+      0% { transform: scale(1.6); opacity: 0; filter: blur(8px); }
+      35% { transform: scale(0.92); opacity: 1; filter: blur(0); }
+      70% { transform: scale(1.08); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .countdown-punch {
+      animation: punchScale 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    @keyframes modalPopIn {
+      0% { transform: scale(0.88); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .modal-pop-in {
+      animation: modalPopIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .f1-light-off {
+      background-color: #0f172a;
+      border-color: #334155;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.8);
+    }
+    .f1-light-red {
+      background: radial-gradient(circle at 35% 35%, #fca5a5 0%, #ef4444 60%, #991b1b 100%);
+      border-color: #f87171;
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.9), inset 0 0 10px rgba(255,255,255,0.4);
+    }
+    .f1-light-green {
+      background: radial-gradient(circle at 35% 35%, #86efac 0%, #10b981 60%, #065f46 100%);
+      border-color: #34d399;
+      box-shadow: 0 0 35px rgba(16, 185, 129, 1), inset 0 0 15px rgba(255,255,255,0.5);
+    }
+
+    /* Correct highlight */
+    .correct-glow-admin {
+      border-color: #10b981 !important;
+      background: rgba(6, 78, 59, 0.85) !important;
+      box-shadow: 0 0 30px rgba(16, 185, 129, 0.6) !important;
+      transform: scale(1.01);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col p-3 sm:p-5 relative select-none">
+
+  <!-- TOÀN BỘ KHUNG HÌNH: ĐẾM NGƯỢC 5S SIÊU TO KHỔNG LỒ (FULLSCREEN MODAL) -->
+  <div id="fullscreen-countdown-modal" class="fixed inset-0 z-[100] hidden flex flex-col items-center justify-center bg-slate-950/95 backdrop-blur-2xl p-4 select-none">
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-600/20 via-red-950/20 to-slate-950 pointer-events-none"></div>
+    <div class="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
+
+    <div class="relative z-10 flex flex-col items-center text-center max-w-xl w-full modal-pop-in">
+      <div id="countdown-badge" class="px-6 py-2.5 rounded-full bg-amber-500/20 border-2 border-amber-400 text-amber-300 font-black text-sm sm:text-base tracking-widest uppercase mb-3 shadow-[0_0_25px_rgba(245,158,11,0.4)] animate-bounce flex items-center gap-2">
+        <span class="text-xl">🚦</span> <span id="countdown-badge-text">CHUẨN BỊ XUẤT PHÁT!</span>
+      </div>
+
+      <h2 id="countdown-subtitle" class="text-slate-200 text-base sm:text-xl font-bold mb-5 drop-shadow">
+        Cuộc đua kiến thức chuẩn bị bắt đầu...
+      </h2>
+
+      <!-- Đèn hiệu xuất phát F1 (5 đèn) -->
+      <div class="flex items-center justify-center gap-3 sm:gap-5 mb-5 bg-slate-900/90 px-6 sm:px-8 py-3.5 rounded-3xl border border-slate-700 shadow-2xl">
+        <div id="f1-light-1" class="w-7 h-7 sm:w-10 sm:h-10 rounded-full border-2 transition-all duration-200 f1-light-off"></div>
+        <div id="f1-light-2" class="w-7 h-7 sm:w-10 sm:h-10 rounded-full border-2 transition-all duration-200 f1-light-off"></div>
+        <div id="f1-light-3" class="w-7 h-7 sm:w-10 sm:h-10 rounded-full border-2 transition-all duration-200 f1-light-off"></div>
+        <div id="f1-light-4" class="w-7 h-7 sm:w-10 sm:h-10 rounded-full border-2 transition-all duration-200 f1-light-off"></div>
+        <div id="f1-light-5" class="w-7 h-7 sm:w-10 sm:h-10 rounded-full border-2 transition-all duration-200 f1-light-off"></div>
+      </div>
+
+      <div class="relative flex items-center justify-center w-56 h-56 sm:w-72 sm:h-72 my-1">
+        <div class="absolute inset-0 rounded-full border-4 border-dashed border-amber-500/30 animate-spin" style="animation-duration: 8s;"></div>
+        <div class="absolute inset-4 rounded-full bg-gradient-to-tr from-amber-500/15 via-red-500/15 to-transparent blur-2xl"></div>
+        
+        <span id="countdown-big-number" class="relative text-8xl sm:text-9xl md:text-[10rem] font-black font-mono tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-amber-200 via-amber-400 to-orange-500 drop-shadow-[0_15px_35px_rgba(245,158,11,0.6)] countdown-punch">
+          5
+        </span>
+      </div>
+
+      <p id="countdown-tip" class="text-xs sm:text-sm text-slate-400 mt-5 font-semibold px-4 py-2 rounded-xl bg-slate-900/60 border border-slate-800">
+        💡 Hãy chuẩn bị ngón tay sẵn sàng trên màn hình!
+      </p>
+    </div>
+  </div>
+
+  <!-- TOP HEADER (CHUẨN XÁC THEO ẢNH 2) -->
+  <header class="glass-panel-neon p-4 sm:p-5 mb-4 flex flex-col md:flex-row items-center justify-between gap-4">
+    
+    <!-- Khối Logo và Tiêu Đề Bài Học -->
+    <div class="flex items-center gap-4">
+      <div class="w-14 h-14 rounded-2xl bg-[#091b3e] border border-blue-400/50 flex items-center justify-center p-2 shadow-lg shrink-0">
+        <img src="/assets/logo_ship.png" class="w-full h-full object-contain" alt="Ship Logo" />
+      </div>
+      <div>
+        <h1 class="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2 flex-wrap">
+          <span>ÔN TẬP: VẬN</span> <span class="text-sky-400">TẢI ĐA PHƯƠNG THỨC</span>
+        </h1>
+        <p class="text-xs text-slate-300 mt-0.5">
+          Bảng điều khiển giáo viên • Trò chơi trắc nghiệm trực tuyến
+        </p>
+      </div>
+    </div>
+
+    <!-- Banner minh họa cảng biển logistics ở góc trên bên phải (Ảnh 2) -->
+    <div class="hidden lg:block w-96 h-16 rounded-2xl overflow-hidden border border-blue-500/30 shadow-inner shrink-0 relative">
+      <img src="/assets/admin_banner.jpg" class="w-full h-full object-cover" alt="Logistics Harbor Sunset" />
+      <div class="absolute inset-0 bg-gradient-to-r from-[#081430] via-transparent to-transparent pointer-events-none"></div>
+    </div>
+
+  </header>
+
+  <!-- THANH ĐIỀU KHIỂN & 5 THẺ KPI (CHUẨN XÁC ẢNH 2) -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-3 mb-4">
+    
+    <!-- THẺ 1: PHÒNG CHƠI (col-span-2) -->
+    <div class="lg:col-span-3 kpi-card p-3.5 flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-300 text-lg shrink-0">
+        👥
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 mb-0.5">
+          <span class="text-xs font-bold text-slate-200">Phòng chơi</span>
+          <span id="badge-race-phase" class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40">
+            Đang chờ
+          </span>
+        </div>
+        <p class="text-[11px] text-slate-400 truncate">Học sinh tham gia qua link bên dưới</p>
+      </div>
+    </div>
+
+    <!-- THẺ 2: LINK THAM GIA CHO HỌC SINH (col-span-3) -->
+    <div class="lg:col-span-3 kpi-card p-3.5 flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-sky-300 text-lg shrink-0">
+        🔗
+      </div>
+      <div class="flex-1 min-w-0">
+        <span class="text-xs font-bold text-slate-200 block mb-1">Link tham gia cho học sinh</span>
+        <div class="flex items-center gap-1.5">
+          <input type="text" id="student-url-display" readonly value="http://localhost:3000/student" 
+            class="bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-700 text-sky-300 font-mono text-xs w-full select-all font-semibold outline-none" />
+          <button onclick="copyStudentLink()" class="px-2 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs shrink-0 transition" title="Sao chép link">
+            📋
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- THẺ 3: THỜI GIAN (VÒNG NEON RỰC RỠ - col-span-2) -->
+    <div class="lg:col-span-2 kpi-card p-2.5 flex items-center justify-center gap-3 relative overflow-hidden">
+      <!-- Vòng tròn neon -->
+      <div class="relative w-16 h-16 rounded-full border-2 border-amber-400/80 flex flex-col items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.5)] bg-slate-950/80">
+        <span class="text-[9px] font-black text-amber-300 uppercase tracking-tighter">⏰ THỜI GIAN</span>
+        <span id="master-sync-clock" class="text-xl font-black font-mono text-amber-400 tracking-tight">20s</span>
+      </div>
+    </div>
+
+    <!-- THẺ 4: CÂU HỎI TIẾN ĐỘ (col-span-2) -->
+    <div class="lg:col-span-2 kpi-card p-3.5 flex flex-col justify-center">
+      <div class="flex items-center gap-1.5 text-xs font-bold text-slate-300 mb-1">
+        <span>🎯</span> <span>CÂU HỎI</span>
+      </div>
+      <div class="flex items-baseline gap-1 text-sky-300 font-black text-xl font-mono" id="current-lap-indicator">
+        1 / 10
+      </div>
+      <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden mt-1.5 border border-slate-800">
+        <div id="q-progress-bar" class="h-full bg-gradient-to-r from-sky-400 to-blue-600 rounded-full transition-all duration-300" style="width: 10%;"></div>
+      </div>
+    </div>
+
+    <!-- THẺ 5: NÚT THAO TÁC CỦA GIÁO VIÊN (col-span-2) -->
+    <div class="lg:col-span-2 kpi-card p-2 flex flex-col justify-center gap-1.5">
+      <!-- Hàng nút chính 1 -->
+      <div class="grid grid-cols-3 gap-1">
+        <button id="btn-start" onclick="adminStartGame()" class="py-1.5 px-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 text-white font-black text-xs transition active:scale-95 shadow flex items-center justify-center gap-1">
+          <span>▶</span> <span class="hidden sm:inline">Bắt đầu</span>
+        </button>
+        <button id="btn-skip" onclick="adminSkip()" class="py-1.5 px-1.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 text-white font-bold text-[11px] transition active:scale-95 shadow flex items-center justify-center gap-1" title="Hiện đáp án ngay">
+          <span>⚡</span> <span class="hidden sm:inline">Hiện</span>
+        </button>
+        <button id="btn-end" onclick="adminEndGame()" class="py-1.5 px-2 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 text-white font-bold text-xs transition active:scale-95 shadow flex items-center justify-center gap-1">
+          <span>⏹</span> <span class="hidden sm:inline">Kết thúc</span>
+        </button>
+      </div>
+
+      <!-- Hàng nút phụ 2 -->
+      <div class="grid grid-cols-3 gap-1 text-[11px]">
+        <button onclick="adminResetGame()" class="py-1 px-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition text-center" title="Khởi động lại vòng thi">
+          ⚙ Cài đặt
+        </button>
+        <button onclick="adminMock50()" class="py-1 px-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition text-center" title="Mô phỏng 50 xe học sinh">
+          📊 Thống kê
+        </button>
+        <button id="btn-sound" onclick="toggleAdminSound()" class="py-1 px-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition text-center" title="Bật/Tắt âm thanh">
+          <span id="sound-icon">🔊 Âm thanh</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MAIN STAGE (2 CỘT CHUẨN XÁC ẢNH 2: CÂU HỎI BÊN TRÁI - ĐƯỜNG ĐUA BÊN PHẢI) -->
+  <main class="flex-1 flex flex-col gap-4">
+
+    <div id="gameplay-stage" class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4">
+
+      <!-- CỘT TRÁI: BẢNG CÂU HỎI TRANG TRỌNG (col-span-5) -->
+      <section class="lg:col-span-5 glass-panel-neon p-5 flex flex-col justify-between relative overflow-hidden shadow-2xl">
+        
+        <div>
+          <!-- Header câu hỏi -->
+          <div class="flex items-center justify-between mb-3">
+            <span id="q-category-tag" class="px-3 py-1 rounded-full bg-blue-600/25 text-blue-300 border border-blue-400/40 text-xs font-bold flex items-center gap-1.5">
+              <span>📖</span> <span id="q-category-text">Chương 1: Tổng quan</span>
+            </span>
+            <span id="q-number-tag" class="text-xs font-black text-amber-400 font-mono">
+              Câu hỏi 1 / 10
+            </span>
+          </div>
+
+          <!-- Khung nội dung câu hỏi lớn kèm icon Tàu (Ảnh 2) -->
+          <div class="bg-slate-950/90 p-4 rounded-2xl border border-blue-500/40 shadow-inner mb-4 flex items-start gap-3.5">
+            <div class="w-12 h-12 rounded-xl bg-[#0c2048] border border-blue-400/50 flex items-center justify-center shrink-0 p-1 shadow">
+              <img id="q-icon-display" src="/assets/logo_ship.png" class="w-full h-full object-contain" alt="Icon" />
+            </div>
+            <p id="q-text-display" class="text-base sm:text-lg font-bold text-slate-100 leading-snug pt-1 flex-1">
+              Bấm "Bắt đầu" ở góc trên để mở câu hỏi đầu tiên...
+            </p>
+          </div>
+
+          <!-- 4 ĐÁP ÁN A, B, C, D (THANH NGANG MÀU SẮC CHUẨN XÁC ẢNH 2) -->
+          <div class="grid grid-cols-1 gap-2.5" id="options-display-grid">
+            
+            <!-- OPTION A (Đỏ) -->
+            <div id="opt-A" class="admin-opt-A p-3.5 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-3 transition-all duration-300">
+              <span class="w-8 h-8 rounded-full bg-gradient-to-tr from-rose-600 to-red-500 text-white font-black flex items-center justify-center shrink-0 text-sm shadow">
+                A
+              </span>
+              <span class="opt-text flex-1 text-slate-100 font-bold leading-snug">Chỉ vận chuyển bằng đường bộ</span>
+            </div>
+
+            <!-- OPTION B (Lam) -->
+            <div id="opt-B" class="admin-opt-B p-3.5 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-3 transition-all duration-300">
+              <span class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-cyan-500 text-white font-black flex items-center justify-center shrink-0 text-sm shadow">
+                B
+              </span>
+              <span class="opt-text flex-1 text-slate-100 font-bold leading-snug">Kết hợp từ hai phương thức vận tải trở lên</span>
+            </div>
+
+            <!-- OPTION C (Lục / Teal) -->
+            <div id="opt-C" class="admin-opt-C p-3.5 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-3 transition-all duration-300">
+              <span class="w-8 h-8 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-black flex items-center justify-center shrink-0 text-sm shadow">
+                C
+              </span>
+              <span class="opt-text flex-1 text-slate-100 font-bold leading-snug">Chỉ vận chuyển bằng đường biển</span>
+            </div>
+
+            <!-- OPTION D (Vàng / Amber) -->
+            <div id="opt-D" class="admin-opt-D p-3.5 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-3 transition-all duration-300">
+              <span class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-600 to-yellow-500 text-white font-black flex items-center justify-center shrink-0 text-sm shadow">
+                D
+              </span>
+              <span class="opt-text flex-1 text-slate-100 font-bold leading-snug">Chỉ vận chuyển bằng đường hàng không</span>
+            </div>
+
+          </div>
+
+          <!-- Khung giải thích kiến thức bài học (Chỉ hiện khi hết giờ) -->
+          <div id="q-explanation-box" class="hidden mt-3 p-3.5 rounded-2xl bg-blue-950/70 border border-blue-400/40 text-xs text-blue-200">
+            <span class="font-bold text-amber-300 block mb-0.5 flex items-center gap-1">
+              <span>💡</span> <b>Kiến thức trọng tâm:</b>
+            </span>
+            <p id="q-explanation-text" class="leading-relaxed"></p>
+          </div>
+
+          <!-- Bảng vinh danh học sinh trả lời đúng (Chỉ hiện khi hết giờ) -->
+          <div id="praise-spotlight" class="hidden mt-3 p-3.5 rounded-2xl bg-emerald-950/70 border border-emerald-400/40 shadow-inner">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-black text-emerald-300 flex items-center gap-1.5">
+                <span>🎉</span> <span>TUYÊN DƯƠNG HỌC SINH CHỌN ĐÚNG:</span>
+              </span>
+              <span class="text-[10px] text-amber-300 font-bold" id="countdown-next-tag">Câu tiếp theo sau: 5s</span>
+            </div>
+            <div id="correct-racers-tags" class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto custom-scrollbar pr-1">
+              <!-- Danh sách học sinh chọn đúng -->
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- CỘT PHẢI: ĐƯỜNG ĐUA TRANH HẠNG TRỰC TIẾP (col-span-7 - CHUẨN XÁC ẢNH 2) -->
+      <section class="lg:col-span-7 glass-panel-neon p-4 sm:p-5 flex flex-col justify-between shadow-2xl relative">
+        
+        <!-- Header Đường đua (Ảnh 2) -->
+        <div class="flex items-center justify-between mb-2.5">
+          <div class="flex items-center gap-3">
+            <div class="text-3xl">🏆</div>
+            <div>
+              <h2 class="text-sm sm:text-base font-black text-white tracking-tight flex items-center gap-2">
+                <span>ĐƯỜNG ĐUA</span> <span class="text-amber-400">TRANH HẠNG TRỰC TIẾP</span>
+              </h2>
+              <p class="text-[11px] text-slate-300">
+                Học sinh trả lời càng nhanh và đúng càng vươn lên dẫn đầu!
+              </p>
+            </div>
+          </div>
+
+          <!-- Nút chuyển chế độ xem: Cao Tốc 6 Làn vs Bảng 70 Xe (Ảnh 2) -->
+          <div class="flex items-center gap-2">
+            <div class="text-xl">🏁</div>
+            <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px] font-bold">
+              <button id="btn-view-highway" onclick="switchTrackView('highway')" class="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-black transition shadow-sm flex items-center gap-1">
+                🏎️ Cao Tốc 6 Làn ⌵
+              </button>
+              <button id="btn-view-standings" onclick="switchTrackView('standings')" class="px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
+                📊 Vị Trí 70 Xe
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- KHUNG ĐƯỜNG ĐUA (CHỨA TOÀN BỘ 50-70 XE CÙNG LÚC - CHUẨN XÁC ẢNH 2) -->
+        <div id="view-highway-track" class="relative w-full rounded-2xl overflow-hidden bg-[#071026]/90 border border-blue-500/40 flex-1 min-h-[320px] max-h-[380px] flex flex-col justify-between shadow-2xl relative select-none">
+          <div class="track-kerb-top w-full"></div>
+          
+          <div class="relative flex-1 flex flex-col justify-between py-1 px-10 overflow-hidden" id="highway-lanes-wrapper">
+            
+            <!-- Cột số thứ tự 1 đến 10 bên trái (Ảnh 2) -->
+            <div class="absolute left-2 top-2 bottom-2 w-6 flex flex-col justify-around items-center z-10 pointer-events-none text-[9px] font-black">
+              <span class="w-4 h-4 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center">1</span>
+              <span class="w-4 h-4 rounded-full bg-blue-500/30 text-blue-300 border border-blue-500/40 flex items-center justify-center">2</span>
+              <span class="w-4 h-4 rounded-full bg-amber-600/30 text-amber-300 border border-amber-600/40 flex items-center justify-center">3</span>
+              <span class="w-4 h-4 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center">4</span>
+              <span class="w-4 h-4 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center">5</span>
+              <span class="w-4 h-4 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center">6</span>
+              <span class="w-4 h-4 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center">7</span>
+              <span class="w-4 h-4 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center">8</span>
+              <span class="w-4 h-4 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center">9</span>
+              <span class="w-4 h-4 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center">10</span>
+            </div>
+
+            <!-- Vạch xuất phát START (bên trái) -->
+            <div class="absolute left-9 top-0 bottom-0 w-2.5 bg-blue-500/25 border-r border-blue-400/60 pointer-events-none z-0 flex flex-col justify-between items-center py-2">
+              <span class="text-[8px] font-black tracking-widest text-slate-400 -rotate-90">START</span>
+            </div>
+
+            <!-- Các đường kẻ đứt phân chia làn đua và mũi tên >>> (Ảnh 2) -->
+            <div class="absolute inset-0 flex flex-col justify-around pointer-events-none z-0 px-12 opacity-30">
+              <div class="border-b border-dashed border-blue-400 w-full flex justify-end text-[9px] text-blue-300">>>></div>
+              <div class="border-b border-dashed border-blue-400 w-full flex justify-end text-[9px] text-blue-300">>>></div>
+              <div class="border-b border-dashed border-blue-400 w-full flex justify-end text-[9px] text-blue-300">>>></div>
+              <div class="border-b border-dashed border-blue-400 w-full flex justify-end text-[9px] text-blue-300">>>></div>
+              <div class="border-b border-dashed border-blue-400 w-full flex justify-end text-[9px] text-blue-300">>>></div>
+            </div>
+
+            <!-- Vạch đích FINISH cờ ca-rô (bên phải - Ảnh 2) -->
+            <div class="absolute right-3 top-0 bottom-0 w-6 finish-flag-bar pointer-events-none z-0 shadow-xl flex flex-col justify-between items-center py-2">
+              <span class="text-[8px] font-black tracking-widest text-slate-900 bg-white/90 px-0.5 rounded -rotate-90 font-mono">FINISH</span>
+            </div>
+            
+            <!-- SÂN KHẤU XE F1 (CHỨA CẢ 50-70 XE DI CHUYỂN TỌA ĐỘ) -->
+            <div id="highway-cars-stage" class="relative w-full h-full min-h-[280px] z-10">
+              <!-- Empty state chuẩn xác Ảnh 2 -->
+              <div class="h-full flex flex-col items-center justify-center text-center p-4">
+                <div class="w-16 h-16 rounded-full bg-blue-500/10 border border-blue-400/30 flex items-center justify-center text-3xl mb-2 text-blue-300">
+                  👥
+                </div>
+                <h4 class="text-sm font-bold text-slate-200">Chờ các bạn học sinh kết nối vào phòng...</h4>
+                <p class="text-xs text-slate-400 mt-0.5">Khi có học sinh tham gia, xe sẽ xuất hiện trên đường đua!</p>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="track-kerb-bottom w-full"></div>
+        </div>
+
+        <!-- VIEW 2: BẢNG VỊ TRÍ 70 XE (PIT LANE STANDINGS BARS) -->
+        <div id="view-standings-track" class="hidden relative w-full rounded-2xl overflow-hidden bg-slate-950/95 border border-slate-800 flex-1 min-h-[320px] max-h-[380px] p-2.5 flex flex-col shadow-2xl">
+          <div class="text-[11px] font-bold text-slate-400 mb-1.5 flex items-center justify-between px-2 pb-1 border-b border-slate-800">
+            <span>🏁 THỨ TỰ XE ĐUA (SINH VIÊN ĐIỂM CAO HƠN Ở TRÊN)</span>
+            <span class="text-amber-400 font-mono">Tự động leo hạng khi chọn đúng</span>
+          </div>
+          <div id="standings-cars-list" class="flex-1 overflow-y-auto space-y-1.5 pr-1 custom-scrollbar"></div>
+        </div>
+
+        <!-- FOOTER ĐƯỜNG ĐUA (CHUẨN XÁC ẢNH 2) -->
+        <div class="pt-3 border-t border-blue-500/20 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 mt-2 gap-2">
+          <div class="flex items-center gap-1.5 text-slate-300">
+            <span>💡</span> <span>Mỗi câu có 20s suy nghĩ. Hết giờ mới công bố đáp án và vinh danh người đúng!</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="total-racers-badge" class="px-3 py-1 rounded-full bg-blue-600/20 text-blue-300 border border-blue-500/30 font-bold flex items-center gap-1.5">
+              <span>👥</span> <span>0 học sinh đang online</span>
+            </span>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- GIAI ĐOẠN KẾT THÚC: BỤC VINH DANH CHUNG CUỘC -->
+    <div id="podium-stage" class="hidden flex-1 glass-panel-neon p-6 shadow-2xl flex flex-col justify-between">
+      <div>
+        <div class="text-center mb-6">
+          <h2 class="text-2xl sm:text-3xl font-black text-amber-400 tracking-tight">
+            🏆 BỤC VINH DANH CHUNG CUỘC 🏆
+          </h2>
+          <p class="text-xs text-slate-300 mt-1">Chúc mừng các bạn đã xuất sắc hoàn thành trọn vẹn 10 câu hỏi ôn tập!</p>
+        </div>
+
+        <!-- Tháp 3D -->
+        <div class="flex items-end justify-center gap-4 sm:gap-6 pt-10 pb-6 max-w-2xl mx-auto px-4">
+          
+          <!-- HẠNG 2: Á QUÂN -->
+          <div class="flex-1 flex flex-col items-center">
+            <div id="pod-2-avatar" class="text-4xl mb-1">🚚</div>
+            <div id="pod-2-name" class="text-xs sm:text-sm font-black text-slate-200 text-center truncate max-w-[130px]">Chờ kết quả...</div>
+            <div id="pod-2-score" class="text-xs font-black text-slate-400 font-mono mb-2">0đ</div>
+            <div class="h-36 w-full rounded-t-2xl flex flex-col items-center justify-between p-3 shadow-2xl border-t-2 border-slate-400 bg-gradient-to-b from-slate-400 to-slate-700">
+              <span class="text-3xl font-black text-slate-200">🥈</span>
+              <span class="text-xs font-bold text-slate-900 bg-white/80 px-2 py-0.5 rounded-full">HẠNG 2</span>
+            </div>
+          </div>
+
+          <!-- HẠNG 1: QUÁN QUÂN -->
+          <div class="flex-1 flex flex-col items-center -mt-6">
+            <div class="text-2xl animate-bounce">👑</div>
+            <div id="pod-1-avatar" class="text-5xl mb-1">🏎️</div>
+            <div id="pod-1-name" class="text-sm sm:text-base font-black text-amber-300 text-center truncate max-w-[150px]">Chờ kết quả...</div>
+            <div id="pod-1-score" class="text-sm font-black text-amber-400 font-mono mb-2">0đ</div>
+            <div class="h-52 w-full rounded-t-2xl flex flex-col items-center justify-between p-3 shadow-2xl border-t-2 border-amber-300 bg-gradient-to-b from-amber-400 to-yellow-600">
+              <span class="text-4xl font-black text-amber-950">🥇</span>
+              <span class="text-xs font-black text-amber-950 bg-amber-200 px-3 py-1 rounded-full uppercase tracking-wider">QUÁN QUÂN</span>
+            </div>
+          </div>
+
+          <!-- HẠNG 3: QUÝ QUÂN -->
+          <div class="flex-1 flex flex-col items-center">
+            <div id="pod-3-avatar" class="text-4xl mb-1">✈️</div>
+            <div id="pod-3-name" class="text-xs sm:text-sm font-black text-slate-200 text-center truncate max-w-[130px]">Chờ kết quả...</div>
+            <div id="pod-3-score" class="text-xs font-black text-slate-400 font-mono mb-2">0đ</div>
+            <div class="h-28 w-full rounded-t-2xl flex flex-col items-center justify-between p-3 shadow-2xl border-t-2 border-amber-700 bg-gradient-to-b from-amber-700 to-amber-950">
+              <span class="text-3xl font-black text-amber-200">🥉</span>
+              <span class="text-xs font-bold text-white bg-black/40 px-2 py-0.5 rounded-full">HẠNG 3</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="text-center pt-4 border-t border-slate-800">
+        <button onclick="adminResetGame()" class="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-sm transition shadow-lg shadow-amber-500/20">
+          🔄 Bắt đầu lượt chơi mới
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // BỘ ÂM THANH SYNTHESIZER CHO MÀN HÌNH GIÁO VIÊN
+    class AdminAudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.isMuted = false;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+      beep(freq = 600) {
+        if (this.isMuted) return;
+        this.init();
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.15);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.15);
+        } catch(e) {}
+      }
+      horn() {
+        if (this.isMuted) return;
+        this.init();
+        try {
+          [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+            setTimeout(() => {
+              const osc = this.ctx.createOscillator();
+              const gain = this.ctx.createGain();
+              osc.type = 'triangle';
+              osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+              gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
+              gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.4);
+              osc.connect(gain);
+              gain.connect(this.ctx.destination);
+              osc.start();
+              osc.stop(this.ctx.currentTime + 0.4);
+            }, idx * 60);
+          });
+        } catch(e) {}
+      }
+      toggle() {
+        this.isMuted = !this.isMuted;
+        return !this.isMuted;
+      }
+    }
+
+    const soundEngine = new AdminAudioEngine();
+
+    function toggleAdminSound() {
+      const active = soundEngine.toggle();
+      document.getElementById('sound-icon').textContent = active ? '🔊 Âm thanh' : '🔇 Đã tắt';
+    }
+
+    function copyStudentLink() {
+      const input = document.getElementById('student-url-display');
+      input.select();
+      navigator.clipboard.writeText(input.value);
+      alert("Đã sao chép link tham gia cho học sinh: " + input.value);
+    }
+
+    // SOCKET & CLIENT LOGIC
+    const socket = io();
+    let currentLeaderboard = [];
+    let currentQuestionData = null;
+
+    // Cập nhật link học sinh với địa chỉ IP mạng nội bộ
+    const studentUrl = `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}/student`;
+    document.getElementById('student-url-display').value = studentUrl;
+
+    function adminStartGame() {
+      soundEngine.init();
+      socket.emit('admin:start_game');
+    }
+
+    function adminSkip() {
+      socket.emit('admin:skip_question');
+    }
+
+    function adminEndGame() {
+      if (confirm("Thầy/Cô có chắc chắn muốn kết thúc bài thi ngay bây giờ không?")) {
+        socket.emit('admin:end_game');
+      }
+    }
+
+    function adminResetGame() {
+      if (confirm("Thầy/Cô có muốn đặt lại toàn bộ trò chơi về phòng chờ không?")) {
+        socket.emit('admin:reset_game');
+      }
+    }
+
+    // FULLSCREEN OVERLAY 5S
+    socket.on('game:countdown_start', (data) => {
+      showFullscreenCountdown(data.seconds, data.title, data.subtitle, data.tip, data.type);
+    });
+
+    socket.on('game:countdown_tick', (data) => {
+      tickFullscreenCountdown(data.seconds, data.type);
+    });
+
+    // Đồng hồ đếm ngược 20s
+    socket.on('sync:tick', (data) => {
+      const clock = document.getElementById('master-sync-clock');
+      const badge = document.getElementById('badge-race-phase');
+      const progress = document.getElementById('q-progress-bar');
+
+      if (data.status === 'question') {
+        clock.textContent = `${data.timerSeconds}s`;
+        if (progress) {
+          const pct = Math.max(5, ((data.timerSeconds / 20) * 100));
+          progress.style.width = `${pct}%`;
+        }
+
+        if (data.timerSeconds <= 5) {
+          clock.className = "text-xl font-black font-mono text-red-400 tracking-tight animate-pulse";
+        } else {
+          clock.className = "text-xl font-black font-mono text-amber-400 tracking-tight";
+        }
+
+        badge.textContent = "Đang làm bài";
+        badge.className = "px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse";
+      } else if (data.status === 'reveal') {
+        clock.textContent = `${data.timerSeconds}s`;
+        clock.className = "text-xl font-black font-mono text-emerald-400 tracking-tight animate-pulse";
+        document.getElementById('countdown-next-tag').textContent = `Câu tiếp theo sau: ${data.timerSeconds}s`;
+
+        badge.textContent = "Công bố đáp án";
+        badge.className = "px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse";
+      }
+    });
+
+    socket.on('sync:leaderboard', (data) => {
+      currentLeaderboard = data.leaderboard || [];
+      renderLeaderboard(currentLeaderboard);
+      document.getElementById('total-racers-badge').innerHTML = `<span>👥</span> <span>${data.studentCount} học sinh đang online</span>`;
+    });
+
+    socket.on('game:started', (data) => {
+      hideFullscreenCountdown();
+      document.getElementById('badge-race-phase').textContent = "Đang làm bài";
+      document.getElementById('badge-race-phase').className = "px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse";
+
+      document.getElementById('gameplay-stage').classList.remove('hidden');
+      document.getElementById('podium-stage').classList.add('hidden');
+
+      displayQuestionClean(data.question, data.questionIndex, data.totalQuestions);
+    });
+
+    socket.on('round:next', (data) => {
+      hideFullscreenCountdown();
+      if (data.leaderboard) {
+        currentLeaderboard = data.leaderboard;
+        renderLeaderboard(currentLeaderboard);
+      }
+      displayQuestionClean(data.question, data.questionIndex, data.totalQuestions);
+    });
+
+    socket.on('round:reveal', (data) => {
+      revealAnswerPopup(data);
+    });
+
+    socket.on('game:finished', (data) => {
+      hideFullscreenCountdown();
+      document.getElementById('badge-race-phase').textContent = "Đã kết thúc";
+      document.getElementById('badge-race-phase').className = "px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-500/20 text-blue-300 border border-blue-500/40";
+
+      document.getElementById('gameplay-stage').classList.add('hidden');
+      document.getElementById('podium-stage').classList.remove('hidden');
+
+      renderPodium(data.podium || []);
+      try {
+        confetti({ particleCount: 160, spread: 120, origin: { y: 0.5 } });
+      } catch(e) {}
+    });
+
+    socket.on('game:reset', () => {
+      hideFullscreenCountdown();
+      document.getElementById('badge-race-phase').textContent = "Phòng chờ";
+      document.getElementById('badge-race-phase').className = "px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/40";
+      document.getElementById('gameplay-stage').classList.remove('hidden');
+      document.getElementById('podium-stage').classList.add('hidden');
+      document.getElementById('praise-spotlight').classList.add('hidden');
+      document.getElementById('q-explanation-box').classList.add('hidden');
+      document.getElementById('master-sync-clock').textContent = "20s";
+    });
+
+    function showFullscreenCountdown(seconds, title, subtitle, tip, type) {
+      const modal = document.getElementById('fullscreen-countdown-modal');
+      document.getElementById('countdown-badge-text').textContent = title || "CHUẨN BỊ XUẤT PHÁT!";
+      document.getElementById('countdown-subtitle').textContent = subtitle || "Cuộc đua kiến thức chuẩn bị bắt đầu...";
+      document.getElementById('countdown-tip').textContent = tip || "💡 Hãy chuẩn bị ngón tay sẵn sàng trên màn hình!";
+
+      for (let i = 1; i <= 5; i++) {
+        const light = document.getElementById(`f1-light-${i}`);
+        if (light) light.className = "w-7 h-7 sm:w-10 sm:h-10 rounded-full border-2 transition-all duration-200 f1-light-off";
+      }
+
+      modal.classList.remove('hidden');
+      tickFullscreenCountdown(seconds, type);
+    }
+
+    function tickFullscreenCountdown(seconds, type) {
+      const numEl = document.getElementById('countdown-big-number');
+      if (!numEl) return;
+
+      numEl.classList.remove('countdown-punch');
+      void numEl.offsetWidth;
+      numEl.classList.add('countdown-punch');
+
+      if (soundEngine) {
+        if (seconds > 0) {
+          soundEngine.beep(600 + (5 - seconds) * 120);
+        } else {
+          soundEngine.horn();
+        }
+      }
+
+      if (seconds > 0) {
+        numEl.textContent = seconds;
+        numEl.className = "relative text-8xl sm:text-9xl md:text-[10rem] font-black font-mono tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-amber-200 via-amber-400 to-orange-500 drop-shadow-[0_15px_35px_rgba(245,158,11,0.6)] countdown-punch";
+
+        const litCount = Math.max(1, 6 - seconds);
+        for (let i = 1; i <= 5; i++) {
+          const light = document.getElementById(`f1-light-${i}`);
+          if (light) {
+            if (i <= litCount) {
+              light.className = "w-7 h-7 sm:w-10 sm:h-10 rounded-full border-2 transition-all duration-200 f1-light-red";
+            } else {
+              light.className = "w-7 h-7 sm:w-10 sm:h-10 rounded-full border-2 transition-all duration-200 f1-light-off";
+            }
+          }
+        }
+      } else {
+        numEl.textContent = "🚦 GO!";
+        numEl.className = "relative text-6xl sm:text-8xl md:text-9xl font-black font-mono tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-emerald-200 via-emerald-400 to-teal-500 drop-shadow-[0_15px_40px_rgba(16,185,129,0.8)] countdown-punch";
+
+        for (let i = 1; i <= 5; i++) {
+          const light = document.getElementById(`f1-light-${i}`);
+          if (light) light.className = "w-7 h-7 sm:w-10 sm:h-10 rounded-full border-2 transition-all duration-200 f1-light-green";
+        }
+
+        try {
+          confetti({ particleCount: 50, spread: 80, origin: { y: 0.6 } });
+        } catch(e) {}
+      }
+    }
+
+    function hideFullscreenCountdown() {
+      const modal = document.getElementById('fullscreen-countdown-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    // HIỂN THỊ CÂU HỎI TRANG TRỌNG (ẢNH 2)
+    function displayQuestionClean(q, idx, total) {
+      currentQuestionData = q;
+
+      document.getElementById('q-category-text').textContent = q.round;
+      document.getElementById('q-number-tag').textContent = `Câu hỏi ${idx + 1} / ${total}`;
+      document.getElementById('current-lap-indicator').textContent = `${idx + 1} / ${total}`;
+      document.getElementById('q-text-display').textContent = q.text;
+
+      // Cập nhật thanh tiến độ câu hỏi
+      const pct = Math.round(((idx + 1) / total) * 100);
+      const prog = document.getElementById('q-progress-bar');
+      if (prog) prog.style.width = `${pct}%`;
+
+      document.getElementById('praise-spotlight').classList.add('hidden');
+      document.getElementById('q-explanation-box').classList.add('hidden');
+
+      const optKeys = ['A', 'B', 'C', 'D'];
+      const defaultStyles = ['admin-opt-A', 'admin-opt-B', 'admin-opt-C', 'admin-opt-D'];
+
+      optKeys.forEach((key, i) => {
+        const box = document.getElementById(`opt-${key}`);
+        if (!q.options[i]) {
+          box.classList.add('hidden');
+          return;
+        }
+        box.classList.remove('hidden', 'correct-glow-admin', 'opacity-30');
+        box.className = `${defaultStyles[i]} p-3.5 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-3 transition-all duration-300 opacity-100`;
+        box.querySelector('.opt-text').textContent = q.options[i].text;
+      });
+    }
+
+    // KHI HẾT 20S: POPUP ĐÁP ÁN VÀ VINH DANH (ẢNH 2)
+    function revealAnswerPopup(data) {
+      if (data.leaderboard) {
+        currentLeaderboard = data.leaderboard;
+        renderLeaderboard(currentLeaderboard);
+      }
+
+      const correctIdx = data.correctOptionIndex;
+      const optKeys = ['A', 'B', 'C', 'D'];
+
+      optKeys.forEach((key, i) => {
+        const box = document.getElementById(`opt-${key}`);
+        if (!currentQuestionData || !currentQuestionData.options[i]) {
+          box.classList.add('hidden');
+          return;
+        }
+        box.classList.remove('hidden');
+
+        if (i === correctIdx) {
+          box.classList.add('correct-glow-admin');
+          box.style.opacity = '1';
+        } else {
+          box.classList.remove('correct-glow-admin');
+          box.style.opacity = '0.3';
+        }
+      });
+
+      document.getElementById('q-explanation-text').textContent = data.explanation;
+      document.getElementById('q-explanation-box').classList.remove('hidden');
+
+      const praiseBox = document.getElementById('praise-spotlight');
+      const correctTags = document.getElementById('correct-racers-tags');
+      correctTags.innerHTML = '';
+
+      if (data.correctRacers && data.correctRacers.length > 0) {
+        data.correctRacers.forEach(r => {
+          const badge = document.createElement('span');
+          badge.className = "px-3 py-1.5 rounded-xl bg-emerald-600/30 border border-emerald-400 text-emerald-200 font-bold flex items-center gap-1.5 text-xs animate-bounce shadow-md";
+          badge.innerHTML = `<span>${r.avatar || '🏎️'}</span> <span class="text-white">${r.name}</span> <span class="text-amber-300 font-bold">(+${r.pointsEarned}đ)</span>`;
+          correctTags.appendChild(badge);
+        });
+      } else {
+        correctTags.innerHTML = '<span class="text-slate-400 italic">Chưa có bạn nào trả lời đúng ở câu hỏi này!</span>';
+      }
+      praiseBox.classList.remove('hidden');
+    }
+
+    // CHUYỂN ĐỔI CHẾ ĐỘ XEM ĐƯỜNG ĐUA
+    let currentTrackMode = 'highway';
+    function switchTrackView(mode) {
+      currentTrackMode = mode;
+      const highwayEl = document.getElementById('view-highway-track');
+      const standingsEl = document.getElementById('view-standings-track');
+      const btnHighway = document.getElementById('btn-view-highway');
+      const btnStandings = document.getElementById('btn-view-standings');
+
+      if (mode === 'highway') {
+        highwayEl.classList.remove('hidden');
+        standingsEl.classList.add('hidden');
+        btnHighway.className = "px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-black transition shadow-sm flex items-center gap-1";
+        btnStandings.className = "px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition";
+      } else {
+        highwayEl.classList.add('hidden');
+        standingsEl.classList.remove('hidden');
+        btnStandings.className = "px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-black transition shadow-sm flex items-center gap-1";
+        btnHighway.className = "px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition";
+      }
+    }
+
+    function adminMock50() {
+      socket.emit('admin:generate_mock_students', { count: 50 });
+    }
+
+    function adminClearMock() {
+      if (confirm("Thầy/Cô có muốn xóa toàn bộ học sinh thử nghiệm để chuẩn bị vào lớp thật không?")) {
+        socket.emit('admin:clear_mock_students');
+      }
+    }
+
+    // RENDER ĐƯỜNG ĐUA CAO TỐC CHO 50-70 HỌC SINH (ẢNH 2)
+    function renderLeaderboard(list) {
+      currentLeaderboard = list || [];
+      const stage = document.getElementById('highway-cars-stage');
+      if (!stage) return;
+
+      if (!currentLeaderboard || currentLeaderboard.length === 0) {
+        stage.innerHTML = `
+          <div class="h-full flex flex-col items-center justify-center text-center p-4">
+            <div class="w-16 h-16 rounded-full bg-blue-500/10 border border-blue-400/30 flex items-center justify-center text-3xl mb-2 text-blue-300">👥</div>
+            <h4 class="text-sm font-bold text-slate-200">Chờ các bạn học sinh kết nối vào phòng...</h4>
+            <p class="text-xs text-slate-400 mt-0.5">Khi có học sinh tham gia, xe sẽ xuất hiện trên đường đua!</p>
+          </div>
+        `;
+        return;
+      }
+
+      stage.innerHTML = '';
+      const totalLanes = 6;
+      const maxScore = Math.max(1200, (currentLeaderboard[0]?.score || 0) + 150);
+
+      currentLeaderboard.forEach((racer, idx) => {
+        const rank = idx + 1;
+        const lane = idx % totalLanes;
+        const topPx = (lane * 42) + 4;
+
+        const scoreRatio = maxScore > 0 ? (racer.score / maxScore) : 0;
+        const posPercent = Math.min(86, Math.max(4, 5 + (scoreRatio * 81)));
+
+        const color = racer.carColor || '#ef4444';
+        const isLeader = (rank === 1 && racer.score > 0);
+        const isRight = (racer.lastAnswerCorrect === true);
+
+        const words = racer.name.trim().split(' ');
+        const shortName = words.length > 2 ? words.slice(-2).join(' ') : racer.name;
+
+        const carEl = document.createElement('div');
+        carEl.className = "absolute f1-car-highway flex items-center gap-1.5 z-20 cursor-pointer select-none group";
+        carEl.style.left = `${posPercent}%`;
+        carEl.style.top = `${topPx}px`;
+
+        carEl.innerHTML = `
+          <div class="relative flex items-center">
+            ${isRight ? '<span class="absolute -left-3 text-xs nitro-flame">🔥</span>' : ''}
+            <div class="w-8 h-8 rounded-xl bg-slate-950 border border-blue-400/50 flex items-center justify-center shadow-lg text-lg relative" style="border-color: ${color};">
+              <span>${racer.avatar || '🏎️'}</span>
+              ${isLeader ? '<span class="absolute -top-2.5 -right-1 text-xs">👑</span>' : ''}
+            </div>
+            <div class="ml-1.5 px-2 py-0.5 rounded-lg bg-slate-950/90 border border-slate-700 text-[10px] font-bold text-slate-200 whitespace-nowrap shadow flex items-center gap-1">
+              <span class="font-mono text-amber-400 font-black">#${rank}</span>
+              <span class="truncate max-w-[80px]">${shortName}</span>
+              <span class="font-mono text-slate-400 text-[9px]">(${racer.score}đ)</span>
+            </div>
+          </div>
+        `;
+        stage.appendChild(carEl);
+      });
+
+      renderStandingsTrack(currentLeaderboard);
+    }
+
+    function renderStandingsTrack(list) {
+      const container = document.getElementById('standings-cars-list');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (!list || list.length === 0) {
+        container.innerHTML = '<div class="text-center py-6 text-slate-500 text-xs">Chưa có tay đua nào vào phòng</div>';
+        return;
+      }
+
+      const maxScore = Math.max(1200, (list[0]?.score || 0) + 150);
+
+      list.forEach((racer, idx) => {
+        const rank = idx + 1;
+        const pct = Math.min(100, Math.max(5, (racer.score / maxScore) * 100));
+        const color = racer.carColor || '#ef4444';
+
+        const row = document.createElement('div');
+        row.className = "flex items-center gap-2 p-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs";
+        row.innerHTML = `
+          <span class="w-6 font-mono font-black ${rank <= 3 ? 'text-amber-400' : 'text-slate-400'} text-center">#${rank}</span>
+          <span class="text-base">${racer.avatar || '🏎️'}</span>
+          <span class="font-bold text-slate-200 truncate w-24">${racer.name}</span>
+          <div class="flex-1 bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800 p-0.5">
+            <div class="h-full rounded-full transition-all duration-700" style="width: ${pct}%; background-color: ${color};"></div>
+          </div>
+          <span class="font-mono font-black text-amber-300 w-12 text-right">${racer.score}đ</span>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function renderPodium(podium) {
+      const p1 = podium[0] || { name: 'Chưa có', score: 0, avatar: '🏎️' };
+      const p2 = podium[1] || { name: 'Chưa có', score: 0, avatar: '🚚' };
+      const p3 = podium[2] || { name: 'Chưa có', score: 0, avatar: '✈️' };
+
+      document.getElementById('pod-1-name').textContent = p1.name;
+      document.getElementById('pod-1-score').textContent = `${p1.score} điểm`;
+      document.getElementById('pod-1-avatar').textContent = p1.avatar || '🏎️';
+
+      document.getElementById('pod-2-name').textContent = p2.name;
+      document.getElementById('pod-2-score').textContent = `${p2.score} điểm`;
+      document.getElementById('pod-2-avatar').textContent = p2.avatar || '🚚';
+
+      document.getElementById('pod-3-name').textContent = p3.name;
+      document.getElementById('pod-3-score').textContent = `${p3.score} điểm`;
+      document.getElementById('pod-3-avatar').textContent = p3.avatar || '✈️';
+    }
+  </script>
+</body>
+</html>
