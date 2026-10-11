@@ -240,7 +240,7 @@
       <!-- Vòng tròn neon -->
       <div class="relative w-16 h-16 rounded-full border-2 border-amber-400/80 flex flex-col items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.5)] bg-slate-950/80">
         <span class="text-[9px] font-black text-amber-300 uppercase tracking-tighter">⏰ THỜI GIAN</span>
-        <span id="master-sync-clock" class="text-xl font-black font-mono text-amber-400 tracking-tight">20s</span>
+        <span id="master-sync-clock" class="text-xl font-black font-mono text-amber-400 tracking-tight">15s</span>
       </div>
     </div>
 
@@ -250,7 +250,7 @@
         <span>🎯</span> <span>CÂU HỎI</span>
       </div>
       <div class="flex items-baseline gap-1 text-sky-300 font-black text-xl font-mono" id="current-lap-indicator">
-        -- / 10
+        -- / 15
       </div>
       <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden mt-1.5 border border-slate-800">
         <div id="q-progress-bar" class="h-full bg-gradient-to-r from-sky-400 to-blue-600 rounded-full transition-all duration-300" style="width: 0%;"></div>
@@ -492,7 +492,7 @@
         <!-- FOOTER ĐƯỜNG ĐUA (CHUẨN XÁC ẢNH 2) -->
         <div class="pt-3 border-t border-blue-500/20 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 mt-2 gap-2">
           <div class="flex items-center gap-1.5 text-slate-300">
-            <span>💡</span> <span>Mỗi câu có 20s suy nghĩ. Hết giờ mới công bố đáp án và vinh danh người đúng!</span>
+            <span>💡</span> <span>Mỗi câu có 15s suy nghĩ. Hết giờ mới công bố đáp án và vinh danh người đúng!</span>
           </div>
           <div class="flex items-center gap-2">
             <span id="total-racers-badge" class="px-3 py-1 rounded-full bg-blue-600/20 text-blue-300 border border-blue-500/30 font-bold flex items-center gap-1.5">
@@ -512,7 +512,7 @@
           <h2 class="text-2xl sm:text-3xl font-black text-amber-400 tracking-tight">
             🏆 BỤC VINH DANH CHUNG CUỘC 🏆
           </h2>
-          <p class="text-xs text-slate-300 mt-1">Chúc mừng các bạn đã xuất sắc hoàn thành trọn vẹn 10 câu hỏi ôn tập!</p>
+          <p class="text-xs text-slate-300 mt-1">Chúc mừng các bạn đã xuất sắc hoàn thành trọn vẹn 15 câu hỏi ôn tập!</p>
         </div>
 
         <!-- Tháp 3D -->
@@ -684,7 +684,7 @@
       if (data.status === 'question') {
         clock.textContent = `${data.timerSeconds}s`;
         if (progress) {
-          const pct = Math.max(5, ((data.timerSeconds / 20) * 100));
+          const pct = Math.max(5, ((data.timerSeconds / 15) * 100));
           progress.style.width = `${pct}%`;
         }
 
@@ -758,7 +758,7 @@
       document.getElementById('podium-stage').classList.add('hidden');
       document.getElementById('praise-spotlight').classList.add('hidden');
       document.getElementById('q-explanation-box').classList.add('hidden');
-      document.getElementById('master-sync-clock').textContent = "20s";
+      document.getElementById('master-sync-clock').textContent = "15s";
 
       // Ẩn câu hỏi & đáp án, hiển thị thẻ phòng chờ
       document.getElementById('lobby-waiting-card').classList.remove('hidden');
@@ -766,7 +766,7 @@
       document.getElementById('options-display-grid').classList.add('hidden');
       document.getElementById('q-category-text').textContent = "Chờ bắt đầu";
       document.getElementById('q-number-tag').textContent = "Phòng chờ";
-      document.getElementById('current-lap-indicator').textContent = "-- / 10";
+      document.getElementById('current-lap-indicator').textContent = "-- / 15";
       document.getElementById('q-progress-bar').style.width = "0%";
     });
 

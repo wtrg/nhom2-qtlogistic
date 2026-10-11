@@ -235,7 +235,7 @@
         </button>
         <div id="sync-timer-badge" class="flex items-center gap-1 bg-[#161208]/90 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-amber-500/70 text-xs font-mono font-black text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.4)]">
           <span>⏰</span>
-          <span id="sync-timer-text">20s</span>
+          <span id="sync-timer-text">15s</span>
         </div>
       </div>
 
@@ -364,7 +364,7 @@
           <div class="p-2.5 sm:p-3 rounded-xl bg-[#06122d]/85 border border-blue-500/25 flex items-start gap-2 text-[11px] text-slate-300 shadow-inner">
             <span class="text-sm text-red-400 shrink-0">📌</span>
             <p class="leading-snug">
-              <b>Cách chơi:</b> Mỗi câu có 20 giây suy nghĩ. Bấm chọn 1 đáp án A, B, C hoặc D. Khi chọn xong, hãy cùng nhìn lên màn hình lớn của Thầy/Cô nhé!
+              <b>Cách chơi:</b> Mỗi câu có 15 giây suy nghĩ. Bấm chọn 1 đáp án A, B, C hoặc D. Khi chọn xong, hãy cùng nhìn lên màn hình lớn của Thầy/Cô nhé!
             </p>
           </div>
 
@@ -393,7 +393,7 @@
             <!-- Hàng tiêu đề câu hỏi & phân loại -->
             <div class="flex items-center justify-between text-xs font-bold mb-1.5">
               <span id="hud-lap-badge" class="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-blue-600/30 text-blue-300 border border-blue-400/50 text-[11px] sm:text-xs font-black">
-                Câu hỏi 1 / 10
+                Câu hỏi 1 / 15
               </span>
               <span id="hud-category" class="text-[11px] sm:text-xs font-bold text-slate-300 truncate max-w-[200px]">
                 Câu 1 – Dễ | Trắc nghiệm
@@ -437,7 +437,7 @@
           <div id="finish-flag" class="text-5xl animate-bounce">🏆</div>
           <div>
             <h2 id="result-title" class="text-xl sm:text-2xl font-black text-amber-300">HOÀN THÀNH XUẤT SẮC!</h2>
-            <p id="result-sub" class="text-xs text-slate-300 mt-0.5">Bạn đã hoàn thành trọn vẹn 10 câu hỏi ôn tập cùng cả lớp!</p>
+            <p id="result-sub" class="text-xs text-slate-300 mt-0.5">Bạn đã hoàn thành trọn vẹn 15 câu hỏi ôn tập cùng cả lớp!</p>
           </div>
 
           <div class="grid grid-cols-3 gap-1.5 sm:gap-2 text-center">
@@ -729,7 +729,7 @@
 
       if (data.status === 'question') {
         text.textContent = `${data.timerSeconds}s`;
-        const percent = Math.max(0, Math.min(100, (data.timerSeconds / 20) * 100));
+        const percent = Math.max(0, Math.min(100, (data.timerSeconds / 15) * 100));
         bar.style.width = `${percent}%`;
 
         if (data.timerSeconds <= 5) {
@@ -860,22 +860,22 @@
       document.getElementById('view-gameplay').classList.add('hidden');
       document.getElementById('view-result').classList.remove('hidden');
 
-      const accuracy = Math.round((myCorrect / 10) * 100) || 0;
+      const accuracy = Math.round((myCorrect / 15) * 100) || 0;
       document.getElementById('res-score').textContent = myScore;
-      document.getElementById('res-accuracy').textContent = `${accuracy}% (${myCorrect}/10)`;
+      document.getElementById('res-accuracy').textContent = `${accuracy}% (${myCorrect}/15)`;
 
       const title = document.getElementById('result-title');
       const sub = document.getElementById('result-sub');
 
-      if (myScore >= 1200) {
+      if (myScore >= 1600) {
         title.textContent = "QUÁN QUÂN XUẤT SẮC! 🥇";
         sub.textContent = "Bạn là người có thành tích cao nhất lớp, phản xạ tuyệt vời!";
-      } else if (myScore >= 800) {
+      } else if (myScore >= 1000) {
         title.textContent = "Á QUÂN ĐẦY BẢN LĨNH! 🥈";
         sub.textContent = "Kiến thức tác nghiệp cực vững vàng! Xứng đáng bước lên bục vinh danh.";
       } else {
         title.textContent = "HOÀN THÀNH BÀI ÔN TẬP! 🥉";
-        sub.textContent = "Đã hoàn thành 10 câu hỏi cùng cả lớp, hãy tiếp tục rèn luyện nhé!";
+        sub.textContent = "Đã hoàn thành 15 câu hỏi cùng cả lớp, hãy tiếp tục rèn luyện nhé!";
       }
 
       try {

@@ -20,7 +20,7 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'student.
 app.get('/student', (req, res) => res.sendFile(path.join(__dirname, 'public', 'student.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
 
-// 10 CÂU HỎI KAHOOT – VẬN TẢI ĐA PHƯƠNG THỨC THEO YÊU CẦU
+// 15 CÂU HỎI KAHOOT – VẬN TẢI ĐA PHƯƠNG THỨC (XÁO TRỘN 5 CÂU ĐÁNH LỪA CHUYÊN SÂU)
 const QUESTIONS = [
   {
     id: 1,
@@ -38,7 +38,33 @@ const QUESTIONS = [
   },
   {
     id: 2,
-    round: "Câu 2 – Khó | Trắc nghiệm tình huống",
+    round: "Câu 2 – Khó | Trắc nghiệm đánh lừa",
+    category: "Bản chất vai trò MTO",
+    icon: "⚡",
+    text: "Trong vận tải đa phương thức, đặc điểm nào phản ánh chính xác nhất vai trò của MTO?",
+    options: [
+      { label: "A", text: "Trực tiếp thực hiện toàn bộ các chặng vận tải bằng phương tiện do mình quản lý.", isCorrect: false },
+      { label: "B", text: "Tổ chức chuỗi vận tải kết hợp nhiều phương thức và chịu trách nhiệm theo hợp đồng.", isCorrect: true },
+      { label: "C", text: "Điều phối các nhà vận tải riêng lẻ nhưng chỉ chịu trách nhiệm đối với chặng đầu tiên.", isCorrect: false },
+      { label: "D", text: "Đại diện chủ hàng lựa chọn phương thức vận tải nhưng không tham gia tổ chức vận chuyển.", isCorrect: false }
+    ],
+    expl: "MTO tổ chức chuỗi vận tải đa phương thức và chịu trách nhiệm theo phạm vi hợp đồng, không nhất thiết sở hữu hay trực tiếp vận hành toàn bộ phương tiện."
+  },
+  {
+    id: 3,
+    round: "Câu 3 – Dễ | Đúng / Sai",
+    category: "Đặc điểm sở hữu phương tiện",
+    icon: "🏢",
+    text: "MTO bắt buộc phải sở hữu tất cả phương tiện vận tải được sử dụng.",
+    options: [
+      { label: "A", text: "Đúng", isCorrect: false },
+      { label: "B", text: "Sai", isCorrect: true }
+    ],
+    expl: "Sai! MTO không bắt buộc phải sở hữu phương tiện vận tải. MTO có thể là người không sở hữu tàu/phương tiện (NVO-MTO) mà đi thuê phương tiện của các hãng chuyên ngành."
+  },
+  {
+    id: 4,
+    round: "Câu 4 – Khó | Trắc nghiệm tình huống",
     category: "Nhận diện VTĐPT",
     icon: "🚛",
     text: "Một lô hàng được vận chuyển bằng xe tải, tàu biển rồi xe tải. Toàn bộ hành trình do một MTO nhận trách nhiệm theo hợp đồng. Đặc điểm nào quan trọng nhất để xác định đây là vận tải đa phương thức?",
@@ -51,34 +77,22 @@ const QUESTIONS = [
     expl: "Đặc điểm quyết định: Kết hợp từ 2 phương thức vận tải trở lên và toàn bộ hành trình do duy nhất một MTO chịu trách nhiệm theo một hợp đồng trọn gói."
   },
   {
-    id: 3,
-    round: "Câu 3 – Dễ | Đúng / Sai",
-    category: "Đặc điểm của MTO",
-    icon: "🏢",
-    text: "MTO bắt buộc phải sở hữu tất cả phương tiện vận tải được sử dụng.",
-    options: [
-      { label: "A", text: "Đúng", isCorrect: false },
-      { label: "B", text: "Sai", isCorrect: true }
-    ],
-    expl: "Sai! MTO không bắt buộc phải sở hữu phương tiện vận tải. MTO có thể là người không sở hữu tàu/phương tiện (NVO-MTO) mà đi thuê phương tiện của các hãng chuyên ngành."
-  },
-  {
-    id: 4,
-    round: "Câu 4 – Khó | Sắp xếp thứ tự",
-    category: "Quy trình xử lý tổn thất",
-    icon: "📋",
-    text: "Sắp xếp quy trình xử lý khi phát hiện hàng hóa bị hư hỏng:\n[A] Thông báo cho MTO và bên bảo hiểm\n[B] Kiểm tra, chụp ảnh hiện trạng hàng hóa\n[C] Lập biên bản ghi nhận tổn thất\n[D] Phối hợp giám định và đề xuất phương án xử lý",
-    options: [
-      { label: "A", text: "B → C → A → D", isCorrect: true },
-      { label: "B", text: "A → B → C → D", isCorrect: false },
-      { label: "C", text: "C → B → D → A", isCorrect: false },
-      { label: "D", text: "B → A → C → D", isCorrect: false }
-    ],
-    expl: "Quy trình xử lý chuẩn: [B] Kiểm tra, chụp ảnh hiện trạng → [C] Lập biên bản tổn thất → [A] Thông báo cho MTO & Bảo hiểm → [D] Phối hợp giám định & đề xuất xử lý."
-  },
-  {
     id: 5,
-    round: "Câu 5 – Dễ | Trắc nghiệm",
+    round: "Câu 5 – Khó | Trắc nghiệm đánh lừa",
+    category: "Tác nghiệp xử lý tổn thất",
+    icon: "📦",
+    text: "Khi phát hiện hàng hóa bị hư hỏng lúc nhận hàng, cách xử lý nào hợp lý nhất?",
+    options: [
+      { label: "A", text: "Thông báo ngay cho MTO, sau đó chờ hướng dẫn rồi mới kiểm tra và ghi nhận tổn thất.", isCorrect: false },
+      { label: "B", text: "Lập biên bản với đơn vị giao hàng, tiếp tục vận chuyển rồi bổ sung chứng cứ khi cần.", isCorrect: false },
+      { label: "C", text: "Chụp ảnh hiện trạng, yêu cầu bồi thường sơ bộ rồi tiến hành giám định sau khi thống nhất.", isCorrect: false },
+      { label: "D", text: "Kiểm tra và ghi nhận hiện trạng, lập biên bản, thông báo bên liên quan và phối hợp giám định.", isCorrect: true }
+    ],
+    expl: "Cần ghi nhận hiện trạng và chứng cứ, lập biên bản, thông báo các bên liên quan rồi phối hợp giám định, xử lý tổn thất."
+  },
+  {
+    id: 6,
+    round: "Câu 6 – Dễ | Trắc nghiệm phương thức",
     category: "Đặc tính phương thức",
     icon: "✈️",
     text: "Phương thức vận tải nào nhanh nhất nhưng thường có chi phí cao?",
@@ -91,46 +105,32 @@ const QUESTIONS = [
     expl: "Vận tải hàng không (Air Transport) có tốc độ hành trình nhanh nhất nhưng chi phí cước vận chuyển cao nhất trong các phương thức."
   },
   {
-    id: 6,
-    round: "Câu 6 – Khó | Trắc nghiệm tình huống",
-    category: "Trách nhiệm pháp lý MTO",
-    icon: "⚖️",
-    text: "Một lô hàng bị hư hỏng trong chặng vận tải biển. Khi xác định trách nhiệm của MTO, yếu tố nào cần được xem xét?",
-    options: [
-      { label: "A", text: "Chỉ giá trị hợp đồng mua bán", isCorrect: false },
-      { label: "B", text: "Quy định pháp luật áp dụng và chứng cứ về tổn thất", isCorrect: true },
-      { label: "C", text: "Chỉ số lượng phương tiện tham gia", isCorrect: false },
-      { label: "D", text: "Chỉ thời gian giao hàng dự kiến", isCorrect: false }
-    ],
-    expl: "Trong chế độ trách nhiệm từng chặng (Network Liability), khi xảy ra tổn thất ở chặng biển, cần áp dụng luật điều chỉnh chặng biển và các chứng cứ pháp lý xác minh tổn thất."
-  },
-  {
     id: 7,
-    round: "Câu 7 – Dễ | Trắc nghiệm",
-    category: "Vai trò MTO",
-    icon: "🌐",
-    text: "Vai trò chính của MTO là gì?",
+    round: "Câu 7 – Khó | Trắc nghiệm đánh lừa",
+    category: "Căn cứ trách nhiệm chặng biển",
+    icon: "⚓",
+    text: "Khi hàng hóa bị hư hỏng ở chặng đường biển trong chuỗi vận tải đa phương thức, yếu tố nào cần được xem xét để xác định trách nhiệm của MTO?",
     options: [
-      { label: "A", text: "Sản xuất hàng hóa", isCorrect: false },
-      { label: "B", text: "Tổ chức vận tải đa phương thức", isCorrect: true },
-      { label: "C", text: "Bán bảo hiểm hàng hóa", isCorrect: false },
-      { label: "D", text: "Sản xuất phương tiện vận tải", isCorrect: false }
+      { label: "A", text: "Điều khoản hợp đồng, pháp luật áp dụng và chứng cứ liên quan đến tổn thất.", isCorrect: true },
+      { label: "B", text: "Giá trị hàng hóa, thời gian vận chuyển và mức phí của chặng đường biển.", isCorrect: false },
+      { label: "C", text: "Số lượng nhà vận tải tham gia, phương tiện sử dụng và thời điểm bàn giao hàng.", isCorrect: false },
+      { label: "D", text: "Phạm vi bảo hiểm, lịch trình dự kiến và cam kết giao hàng của đơn vị vận tải.", isCorrect: false }
     ],
-    expl: "MTO (Multimodal Transport Operator) là người đứng ra ký kết hợp đồng, thiết kế mạng lưới tuyến đường và tổ chức toàn diện quá trình vận tải đa phương thức."
+    expl: "Trách nhiệm cần được xem xét dựa trên hợp đồng, quy định pháp luật áp dụng và chứng cứ về tổn thất."
   },
   {
     id: 8,
-    round: "Câu 8 – Khó | Trắc nghiệm phân tích",
-    category: "Lợi ích VTĐPT",
-    icon: "📈",
-    text: "Doanh nghiệp chọn vận tải đa phương thức để giao hàng quốc tế. Lợi ích nào có thể đạt được khi phối hợp các phương thức vận tải hợp lý?",
+    round: "Câu 8 – Khó | Sắp xếp thứ tự",
+    category: "Quy trình xử lý tổn thất",
+    icon: "📋",
+    text: "Sắp xếp quy trình xử lý khi phát hiện hàng hóa bị hư hỏng:\n[A] Thông báo cho MTO và bên bảo hiểm\n[B] Kiểm tra, chụp ảnh hiện trạng hàng hóa\n[C] Lập biên bản ghi nhận tổn thất\n[D] Phối hợp giám định và đề xuất phương án xử lý",
     options: [
-      { label: "A", text: "Loại bỏ hoàn toàn mọi rủi ro vận chuyển", isCorrect: false },
-      { label: "B", text: "Không cần chuẩn bị chứng từ", isCorrect: false },
-      { label: "C", text: "Tối ưu chi phí và thời gian vận chuyển", isCorrect: true },
-      { label: "D", text: "Đảm bảo hàng hóa không bao giờ bị hư hỏng", isCorrect: false }
+      { label: "A", text: "B → C → A → D", isCorrect: true },
+      { label: "B", text: "A → B → C → D", isCorrect: false },
+      { label: "C", text: "C → B → D → A", isCorrect: false },
+      { label: "D", text: "B → A → C → D", isCorrect: false }
     ],
-    expl: "Phối hợp hợp lý các phương thức vận tải (ví dụ kết hợp biển - bộ, đường sắt - biển) giúp tối ưu hóa tổng chi phí logistics và rút ngắn thời gian giao hàng."
+    expl: "Quy trình xử lý chuẩn: [B] Kiểm tra, chụp ảnh hiện trạng → [C] Lập biên bản tổn thất → [A] Thông báo cho MTO & Bảo hiểm → [D] Phối hợp giám định & đề xuất xử lý."
   },
   {
     id: 9,
@@ -146,9 +146,79 @@ const QUESTIONS = [
   },
   {
     id: 10,
-    round: "Câu 10 – Khó | Trắc nghiệm tình huống",
-    category: "Xử lý rủi ro giao hàng",
-    icon: "🚨",
+    round: "Câu 10 – Khó | Trắc nghiệm đánh lừa",
+    category: "Chiến lược tối ưu chuỗi",
+    icon: "🎯",
+    text: "Lợi ích nào thể hiện đúng nhất việc lựa chọn và kết hợp các phương thức vận tải phù hợp?",
+    options: [
+      { label: "A", text: "Giảm chi phí vận chuyển bằng cách ưu tiên phương thức có giá cước thấp nhất.", isCorrect: false },
+      { label: "B", text: "Rút ngắn thời gian giao hàng bằng cách hạn chế số lần chuyển tải giữa các phương thức.", isCorrect: false },
+      { label: "C", text: "Cân đối chi phí, thời gian và hiệu quả vận hành theo đặc điểm của lô hàng.", isCorrect: true },
+      { label: "D", text: "Hạn chế tổn thất bằng cách sử dụng phương thức vận tải có mức độ an toàn cao nhất.", isCorrect: false }
+    ],
+    expl: "Kết hợp phương thức phù hợp nhằm cân đối đồng thời chi phí, thời gian và hiệu quả; không chỉ tối ưu một yếu tố riêng lẻ."
+  },
+  {
+    id: 11,
+    round: "Câu 11 – Dễ | Trắc nghiệm",
+    category: "Vai trò MTO",
+    icon: "🌐",
+    text: "Vai trò chính của MTO là gì?",
+    options: [
+      { label: "A", text: "Sản xuất hàng hóa", isCorrect: false },
+      { label: "B", text: "Tổ chức vận tải đa phương thức", isCorrect: true },
+      { label: "C", text: "Bán bảo hiểm hàng hóa", isCorrect: false },
+      { label: "D", text: "Sản xuất phương tiện vận tải", isCorrect: false }
+    ],
+    expl: "MTO (Multimodal Transport Operator) là người đứng ra ký kết hợp đồng, thiết kế mạng lưới tuyến đường và tổ chức toàn diện quá trình vận tải đa phương thức."
+  },
+  {
+    id: 12,
+    round: "Câu 12 – Khó | Trắc nghiệm pháp lý",
+    category: "Chế độ trách nhiệm",
+    icon: "⚖️",
+    text: "Một lô hàng bị hư hỏng trong chặng vận tải biển. Khi xác định trách nhiệm của MTO, yếu tố nào cần được xem xét?",
+    options: [
+      { label: "A", text: "Chỉ giá trị hợp đồng mua bán", isCorrect: false },
+      { label: "B", text: "Quy định pháp luật áp dụng và chứng cứ về tổn thất", isCorrect: true },
+      { label: "C", text: "Chỉ số lượng phương tiện tham gia", isCorrect: false },
+      { label: "D", text: "Chỉ thời gian giao hàng dự kiến", isCorrect: false }
+    ],
+    expl: "Trong chế độ trách nhiệm từng chặng (Network Liability), khi xảy ra tổn thất ở chặng biển, cần áp dụng luật điều chỉnh chặng biển và các chứng cứ pháp lý xác minh tổn thất."
+  },
+  {
+    id: 13,
+    round: "Câu 13 – Khó | Trắc nghiệm đánh lừa",
+    category: "Xử lý đứt gãy chặng",
+    icon: "🔄",
+    text: "Một chặng đường biển bị chậm, khiến lô hàng có nguy cơ lỡ chặng vận tải tiếp theo. MTO nên ưu tiên phương án nào?",
+    options: [
+      { label: "A", text: "Giữ nguyên lịch trình ban đầu và chờ xác nhận thời gian cập cảng thực tế.", isCorrect: false },
+      { label: "B", text: "Theo dõi tiến độ, phối hợp điều chỉnh chặng tiếp theo và cập nhật các bên liên quan.", isCorrect: true },
+      { label: "C", text: "Chuyển ngay sang phương thức vận tải thay thế mà không cần chờ xác nhận từ các bên.", isCorrect: false },
+      { label: "D", text: "Thông báo nguy cơ giao trễ cho khách hàng và xử lý các chặng tiếp theo sau khi hàng đến.", isCorrect: false }
+    ],
+    expl: "Chủ động theo dõi và phối hợp điều chỉnh giúp giảm nguy cơ chậm trễ dây chuyền và đảm bảo các bên được cập nhật."
+  },
+  {
+    id: 14,
+    round: "Câu 14 – Khó | Trắc nghiệm phân tích",
+    category: "Hiệu quả đa phương thức",
+    icon: "📈",
+    text: "Doanh nghiệp chọn vận tải đa phương thức để giao hàng quốc tế. Lợi ích nào có thể đạt được khi phối hợp các phương thức vận tải hợp lý?",
+    options: [
+      { label: "A", text: "Loại bỏ hoàn toàn mọi rủi ro vận chuyển", isCorrect: false },
+      { label: "B", text: "Không cần chuẩn bị chứng từ", isCorrect: false },
+      { label: "C", text: "Tối ưu chi phí và thời gian vận chuyển", isCorrect: true },
+      { label: "D", text: "Đảm bảo hàng hóa không bao giờ bị hư hỏng", isCorrect: false }
+    ],
+    expl: "Phối hợp hợp lý các phương thức vận tải (ví dụ kết hợp biển - bộ, đường sắt - biển) giúp tối ưu hóa tổng chi phí logistics và rút ngắn thời gian giao hàng."
+  },
+  {
+    id: 15,
+    round: "Câu 15 – Khó | Về đích F1",
+    category: "Ứng phó sự cố chuỗi",
+    icon: "🏁",
     text: "Một lô hàng giao trễ do chặng đường biển bị chậm, khiến chặng vận tải tiếp theo bị ảnh hưởng. Doanh nghiệp nên làm gì để hạn chế thiệt hại?",
     options: [
       { label: "A", text: "Chờ hàng đến nơi rồi mới tìm hiểu nguyên nhân", isCorrect: false },
@@ -160,7 +230,7 @@ const QUESTIONS = [
   }
 ];
 
-const QUESTION_TIME = 20; // 20s answering time
+const QUESTION_TIME = 15; // 15s answering time (giảm xuống 15s theo yêu cầu)
 const REVEAL_TIME = 8;    // 3s xem đáp án + 5s đếm ngược to câu tiếp theo
 const START_COUNTDOWN_TIME = 5; // 5s đếm ngược to trước khi vào trận
 
